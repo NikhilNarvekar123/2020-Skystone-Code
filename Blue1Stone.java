@@ -42,7 +42,7 @@ public class BlueStone extends AutoSystem implements AutoValues {
       telemetry.addLine(stoneLocation);
       telemetry.update();
 
-      int deltaPos = 0;
+      int deltaPos = 1;
 
       //nikhil cant code...also i love nikhil - from sriman t
       if(stoneLocation.equals("BLUE_LEFT")) {
