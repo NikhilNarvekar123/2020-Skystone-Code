@@ -29,6 +29,7 @@ public class TeleOpSystem extends LinearOpMode {
 
   Controller gamepad;
   TeleOpStateMachine state = TeleOpStateMachine.BlockOne;
+  Telemetry t = new Telemetry();
 
   /* Main Execution Loop */
   public void runOpMode() throws InterruptedException {
@@ -62,8 +63,13 @@ public class TeleOpSystem extends LinearOpMode {
 
   }
 
-  public void setState() {
-    
+  public void setState(int stateCounter) {
+
+
+
+
+
+
   }
 
   /* Returns a vector value to move the robot at */
@@ -104,6 +110,71 @@ public class TeleOpSystem extends LinearOpMode {
   public int rangeScaler(double valToScale) {
     int scaleFactor = 2;
     return (int)(Math.round(scaleFactor * valToScale));
+  }
+
+  public void servoControl() {
+
+    if(gamepad.yToggle1)
+      blockServo.setPosition(0.13);
+    else
+      blockServo.setPosition(0.54);
+
+    if(gamepad2.y)
+      capServo.setPosition(1);
+    else
+      capServo.setPosition(0.3);
+
+    if(gamepad2.left_bumper) {
+      leftGrabber.setPosition(0.5);
+      rightGrabber.setPosition(0.67);
+    }
+    else if(gamepad2.right_bumper) {
+      leftGrabber.setPosition(0.36);
+      rightGrabber.setPosition(0.8);
+    }
+
+    if(gamepad.dpadDownToggle1 || gamepad.dpadDownToggle2) {
+      leftFound.setPosition(0.7);
+      rightFound.setPosition(0.24);
+    } else {
+      leftFound.setPosition(0.35);
+      rightFound.setPosition(0.65);
+    }
+
+  }
+
+  public void armControl() {
+
+    double up = gamepad2.right_trigger;
+    double down = gamepad2.left_trigger;
+    boolean maintain = gamepad2.a;
+
+    if(up > 0) {
+      if(liftPos + rangeScaler(up) < 904)
+        liftPos += rangeScaler(up);
+      else if(liftPos + rangeScaler(up) >= 904)
+        liftPos = 904;
+    }
+
+    if(down > 0) {
+      if(liftPos - rangeScaler(down) > 0)
+        liftPos -= rangeScaler(down);
+      else if(liftPos - rangeScaler(down) <= 0)
+        liftPos = 0;
+    }
+
+    if(down == 0 && up == 0) {
+      liftPos -= rangeScaler(up);
+    }
+
+    if(!maintain) {
+      lift.setTargetPosition((int)Math.round(liftPos));
+      lift.setPower(0.2);
+      lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    } else {
+      liftPos = 200;
+    }
+
   }
 
 }

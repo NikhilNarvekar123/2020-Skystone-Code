@@ -307,7 +307,7 @@ public class AutoSystem extends LinearOpMode {
 
     if (angle == 0)
       correction = 0;
-    else
+    else  
       correction = -angle;
 
     correction = correction * gain;
