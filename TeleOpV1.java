@@ -46,6 +46,7 @@ public class TeleOpV1 extends TeleOpSystem {
         rightIntake.setPower(-gamepad1.right_stick_y);
       }
 
+      setState(gamepad.aToggle2,gamepad.)
       if(gamepad.aToggle2) {
         setState();
       }
@@ -62,4 +63,28 @@ public class TeleOpV1 extends TeleOpSystem {
       t.display();
     }
   }
+
+  private class ArmThread extends Thread {
+
+    private TeleOpStateMachine state;
+
+    public ArmThread(TeleOpStateMachine state) {
+      this.state = state;
+    }
+
+    @Override
+    public void run() {
+      try {
+        while(!isInterrupted()) {
+          int encoderPosition = state.getPosition();
+
+          lift.setTargetPosition(encoderPosition);
+          lift.setSpeed(0.2);
+          lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+      } catch(Exception e) {}
+    }
+  }
+
+
 }

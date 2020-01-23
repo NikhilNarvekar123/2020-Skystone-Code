@@ -64,13 +64,13 @@ public class TeleOpSystem extends LinearOpMode {
 
   }
 
-  public void setState(boolean reverse, boolean restart) {
+  public void setState(boolean next, boolean reverse, boolean restart) {
 
     if(restart) {
       state = TeleOpStateMachine.BlockOne;
     } else if(reverse) {
       state = state.prevState();
-    } else {
+    } else if(next) {
       state = state.nextState();
     }
 
@@ -194,5 +194,6 @@ public class TeleOpSystem extends LinearOpMode {
     }
 
   }
+
 
 }
