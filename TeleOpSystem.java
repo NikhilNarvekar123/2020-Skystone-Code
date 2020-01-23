@@ -19,6 +19,7 @@ public class TeleOpSystem extends LinearOpMode {
   double dy, dx, turn = 0.0;
   double liftAdd = 0.0;
   double liftPos = 0.0;
+  int stateCounter = 0;
 
   /* Components */
   DcMotor motorLF, motorLB, motorRF, motorRB;
@@ -28,7 +29,7 @@ public class TeleOpSystem extends LinearOpMode {
   Servo leftGrabber, rightGrabber, capServo;
 
   Controller gamepad;
-  TeleOpStateMachine state = TeleOpStateMachine.BlockOne;
+  TeleOpStateMachine state = TeleOpStateMachine.BlockZero;
   Telemetry t = new Telemetry();
 
   /* Main Execution Loop */
@@ -63,8 +64,25 @@ public class TeleOpSystem extends LinearOpMode {
 
   }
 
-  public void setState(int stateCounter) {
+  public void setState(boolean reverse, boolean restart) {
 
+    if(restart) {
+      state = TeleOpStateMachine.BlockOne;
+    } else if(reverse) {
+      state = state.prevState();
+    } else {
+      state = state.nextState();
+    }
+
+    if(state == TeleOpStateMachine.BlockOne) {
+
+    } else if(state == TeleOpStateMachine.BlockTwo) {
+
+    } else if(state == TeleOpStateMachine.BlockThree) {
+
+    } else if(state == TeleOpStateMachine.BlockFour) {
+
+    }
 
 
 

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="TeleOp V1")
-public class TeleOpV1 extends TeleopSystem {
+public class TeleOpV1 extends TeleOpSystem {
 
   /** Main Execution */
   public void runOpMode() throws InterruptedException {
@@ -38,13 +38,19 @@ public class TeleOpV1 extends TeleopSystem {
       motorRB.setPower(DRIVE_COEFF * (-dy + dx - turn));
 
       /** Auto Intake Toggle **/
-      if(gamepad.xToggle1 || gamepad.xToggle2) {
+      if(gamepad.xToggle1) {
         leftIntake.setPower(0.5);
         rightIntake.setPower(-0.5);
       } else {
         leftIntake.setPower(gamepad1.right_stick_y);
         rightIntake.setPower(-gamepad1.right_stick_y);
       }
+
+      if(gamepad.aToggle2) {
+        setState();
+      }
+
+
 
       servoControl();
       armControl();
