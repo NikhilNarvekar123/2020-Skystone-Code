@@ -11,9 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   /* Vars */
-  double DRIVE_COEFF = 1.0;
-  double TURN_COEFF = 0.8;
-  double LIFT_COEFF = 1.0;
+  double DRIVE_COEFF = LINEAR_COEFF_NORM;
+  double TURN_COEFF = TURN_COEFF_NORM;
   double dy, dx, turn = 0.0;
   double liftPos = 0.0;
 
@@ -59,27 +58,6 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
   }
 
 
-  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) {
-
-    if(restartMachine) {
-      currentState = TeleOpStateMachine.BlockOne;
-      t("Restarting Machine (Block-One)");
-    } else if(reverseState) {
-      currentState = currentState.prevState();
-      t("Reversing Machine " + currentState.getPositionLabel());
-    } else if(nextState) {
-      currentState = currentState.nextState();
-      t("Advancing Machine " + currentState.getPositionLabel());
-    }
-
-    activateLift(currentState.getPosition(), LIFT_PWR);
-    while(lift.isBusy()) { idle(); }
-
-    activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
-    while(lift.isBusy()) { idle(); }
-
-  }
-
   /* Returns a vector value to move the robot at */
   public void setDirectionVector(double x, double y) {
 
@@ -110,12 +88,14 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
     return (int)(Math.round(scaleFactor * valToScale));
   }
 
+  /** Moves lift to a given encoder position at a given power */
   public void activateLift(double position, double pwr) {
     lift.setTargetPosition((int)(Math.round(position)));
     lift.setPower(pwr);
     lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
   }
 
+  /** Controls all on-robot servos */
   public void servoControl() {
 
     if(gamepad.yToggle1)
@@ -147,6 +127,29 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   }
 
+  /** Runs the lift with a state-machine (automated process) */
+  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) {
+
+    if(restartMachine) {
+      currentState = TeleOpStateMachine.BlockOne;
+      t("Restarting Machine (Block-One)");
+    } else if(reverseState) {
+      currentState = currentState.prevState();
+      t("Reversing Machine " + currentState.getPositionLabel());
+    } else if(nextState) {
+      currentState = currentState.nextState();
+      t("Advancing Machine " + currentState.getPositionLabel());
+    }
+
+    activateLift(currentState.getPosition(), LIFT_PWR);
+    while(lift.isBusy()) { idle(); }
+
+    activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
+    while(lift.isBusy()) { idle(); }
+
+  }
+
+  /** Runs the lift manually (using gamepad-triggers) */
   public void armControlManual() {
 
     double upValue = gamepad2.right_trigger;
@@ -175,15 +178,16 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   }
 
+  /** Telemetry-call consolidated into one method */
   public void t(String data) {
     telemetry.addData("", data);
     telemetry.update();
   }
 
+  /** Stacked telemetry-call (more than one data piece to be pushed at once) in overloaded method */
   public void t(String[] data) {
-    for(String s : data) {
+    for(String s : data)
       telemetry.addData("",data);
-    }
     telemetry.update();
   }
 }
