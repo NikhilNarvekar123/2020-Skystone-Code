@@ -8,18 +8,14 @@ import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Disabled
-public class TeleOpSystem extends LinearOpMode {
+public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   /* Vars */
   double DRIVE_COEFF = 1.0;
   double TURN_COEFF = 0.8;
   double LIFT_COEFF = 1.0;
-  double MECANUM_A_SPACE = 6;
-  double MECANUM_B_SPACE = 4;
   double dy, dx, turn = 0.0;
-  double liftAdd = 0.0;
   double liftPos = 0.0;
-  int stateCounter = 0;
 
   /* Components */
   DcMotor motorLF, motorLB, motorRF, motorRB;
@@ -29,8 +25,7 @@ public class TeleOpSystem extends LinearOpMode {
   Servo leftGrabber, rightGrabber, capServo;
 
   Controller gamepad;
-  TeleOpStateMachine state = TeleOpStateMachine.BlockZero;
-  Telemetry t = new Telemetry();
+  TeleOpStateMachine currentState;
 
   /* Main Execution Loop */
   public void runOpMode() throws InterruptedException {
@@ -46,8 +41,8 @@ public class TeleOpSystem extends LinearOpMode {
     blockServo = hardwareMap.get(Servo.class,"blockServo");
     leftIntake = hardwareMap.get(DcMotor.class,"leftIntake");
     rightIntake = hardwareMap.get(DcMotor.class,"rightIntake");
-    leftGrabber = hardwareMap.get(Servo.class,"leftPush");
-    rightGrabber = hardwareMap.get(Servo.class,"rightPush");
+    leftGrabber = hardwareMap.get(Servo.class,"leftGrabber");
+    rightGrabber = hardwareMap.get(Servo.class,"rightGrabber");
     capServo = hardwareMap.get(Servo.class, "capServo");
 
     /* Init Code */
@@ -55,38 +50,33 @@ public class TeleOpSystem extends LinearOpMode {
     lift.setDirection(DcMotor.Direction.REVERSE);
     blockServo.setPosition(0.54);
 
-    gamepad = new Controller(gamepad1,gamepad2);
+    gamepad = new Controller(gamepad1, gamepad2);
+    currentState = TeleOpStateMachine.BlockZero;
 
-    telemetry.addLine("All Systems Ready...");
-    telemetry.update();
-
+    t("All Systems Ready...");
     waitForStart();
 
   }
 
-  public void setState(boolean next, boolean reverse, boolean restart) {
 
-    if(restart) {
-      state = TeleOpStateMachine.BlockOne;
-    } else if(reverse) {
-      state = state.prevState();
-    } else if(next) {
-      state = state.nextState();
+  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) {
+
+    if(restartMachine) {
+      currentState = TeleOpStateMachine.BlockOne;
+      t("Restarting Machine (Block-One)");
+    } else if(reverseState) {
+      currentState = currentState.prevState();
+      t("Reversing Machine " + currentState.getPositionLabel());
+    } else if(nextState) {
+      currentState = currentState.nextState();
+      t("Advancing Machine " + currentState.getPositionLabel());
     }
 
-    if(state == TeleOpStateMachine.BlockOne) {
+    activateLift(currentState.getPosition(), LIFT_PWR);
+    while(lift.isBusy()) { idle(); }
 
-    } else if(state == TeleOpStateMachine.BlockTwo) {
-
-    } else if(state == TeleOpStateMachine.BlockThree) {
-
-    } else if(state == TeleOpStateMachine.BlockFour) {
-
-    }
-
-
-
-
+    activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
+    while(lift.isBusy()) { idle(); }
 
   }
 
@@ -114,86 +104,86 @@ public class TeleOpSystem extends LinearOpMode {
 
   }
 
-  /* Alternate Control System, using stick to rotate as well?? */
-  public double[] setSpeed(double x, double y) {
-    double omega = Math.atan2(y/x);
-    double[] speeds = new double[4];
-    speeds[0] = y - x + (omega * (MECANUM_A_SPACE + MECANUM_B_SPACE));
-    speeds[1] = y + x - (omega * (MECANUM_A_SPACE + MECANUM_B_SPACE));
-    speeds[2] = y - x - (omega * (MECANUM_A_SPACE + MECANUM_B_SPACE));
-    speeds[3] = y + x + (omega * (MECANUM_A_SPACE + MECANUM_B_SPACE));
-  }
-
   /* Modifies a gamepad joystick value to map to the encoder positions of the lift motor. For faster lift, change k. */
   public int rangeScaler(double valToScale) {
     int scaleFactor = 2;
     return (int)(Math.round(scaleFactor * valToScale));
   }
 
+  public void activateLift(double position, double pwr) {
+    lift.setTargetPosition((int)(Math.round(position)));
+    lift.setPower(pwr);
+    lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+  }
+
   public void servoControl() {
 
     if(gamepad.yToggle1)
-      blockServo.setPosition(0.13);
+      blockServo.setPosition(BLOCK_SERVO[1]);
     else
-      blockServo.setPosition(0.54);
+      blockServo.setPosition(BLOCK_SERVO[0]);
 
     if(gamepad2.y)
-      capServo.setPosition(1);
+      capServo.setPosition(CAP_SERVO[1]);
     else
-      capServo.setPosition(0.3);
+      capServo.setPosition(CAP_SERVO[0]);
 
     if(gamepad2.left_bumper) {
-      leftGrabber.setPosition(0.5);
-      rightGrabber.setPosition(0.67);
+      leftGrabber.setPosition(LEFT_GRABBER[0]);
+      rightGrabber.setPosition(RIGHT_GRABBER[0]);
     }
     else if(gamepad2.right_bumper) {
-      leftGrabber.setPosition(0.36);
-      rightGrabber.setPosition(0.8);
+      leftGrabber.setPosition(LEFT_GRABBER[1]);
+      rightGrabber.setPosition(RIGHT_GRABBER[1]);
     }
 
     if(gamepad.dpadDownToggle1 || gamepad.dpadDownToggle2) {
-      leftFound.setPosition(0.7);
-      rightFound.setPosition(0.24);
+      leftFound.setPosition(LEFT_FOUND[1]);
+      rightFound.setPosition(RIGHT_FOUND[1]);
     } else {
-      leftFound.setPosition(0.35);
-      rightFound.setPosition(0.65);
+      leftFound.setPosition(LEFT_FOUND[0]);
+      rightFound.setPosition(RIGHT_FOUND[0]);
     }
 
   }
 
-  public void armControl() {
+  public void armControlManual() {
 
-    double up = gamepad2.right_trigger;
-    double down = gamepad2.left_trigger;
-    boolean maintain = gamepad2.a;
+    double upValue = gamepad2.right_trigger;
+    double downValue = gamepad2.left_trigger;
+    boolean maintain = gamepad2.dpad_up;
 
-    if(up > 0) {
-      if(liftPos + rangeScaler(up) < 904)
-        liftPos += rangeScaler(up);
-      else if(liftPos + rangeScaler(up) >= 904)
-        liftPos = 904;
+    if(upValue > 0) {
+      if(liftPos + rangeScaler(upValue) < BLOCK_POSITION[1])
+        liftPos += rangeScaler(upValue);
+      else
+        liftPos = BLOCK_POSITION[1];
     }
 
-    if(down > 0) {
-      if(liftPos - rangeScaler(down) > 0)
-        liftPos -= rangeScaler(down);
-      else if(liftPos - rangeScaler(down) <= 0)
-        liftPos = 0;
+    if(downValue > 0) {
+      if(liftPos - rangeScaler(downValue) > BLOCK_POSITION[0])
+        liftPos -= rangeScaler(downValue);
+      else
+        liftPos = BLOCK_POSITION[0];
     }
 
-    if(down == 0 && up == 0) {
-      liftPos -= rangeScaler(up);
-    }
-
-    if(!maintain) {
-      lift.setTargetPosition((int)Math.round(liftPos));
-      lift.setPower(0.2);
-      lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    } else {
-      liftPos = 200;
-    }
+    int targetPosition = (int)(Math.round(liftPos));
+    if(!maintain)
+      activateLift(targetPosition, LIFT_PWR);
+    else
+      liftPos = LIFT_MAINTAIN_POSITION;
 
   }
 
+  public void t(String data) {
+    telemetry.addData("", data);
+    telemetry.update();
+  }
 
+  public void t(String[] data) {
+    for(String s : data) {
+      telemetry.addData("",data);
+    }
+    telemetry.update();
+  }
 }
