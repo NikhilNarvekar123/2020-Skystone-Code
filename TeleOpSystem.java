@@ -108,15 +108,6 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
     else
       capServo.setPosition(CAP_SERVO[0]);
 
-    if(gamepad2.left_bumper) {
-      leftGrabber.setPosition(LEFT_GRABBER[0]);
-      rightGrabber.setPosition(RIGHT_GRABBER[0]);
-    }
-    else if(gamepad2.right_bumper) {
-      leftGrabber.setPosition(LEFT_GRABBER[1]);
-      rightGrabber.setPosition(RIGHT_GRABBER[1]);
-    }
-
     if(gamepad.dpadDownToggle1 || gamepad.dpadDownToggle2) {
       leftFound.setPosition(LEFT_FOUND[1]);
       rightFound.setPosition(RIGHT_FOUND[1]);
@@ -127,8 +118,22 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   }
 
+  /** Control block grabbers during auto and manual threads */
+  public void controlBlock(boolean close, boolean open) {
+
+    if(open) {
+      leftGrabber.setPosition(LEFT_GRABBER[0]);
+      rightGrabber.setPosition(RIGHT_GRABBER[0]);
+    }
+    else if(close) {
+      leftGrabber.setPosition(LEFT_GRABBER[1]);
+      rightGrabber.setPosition(RIGHT_GRABBER[1]);
+    }
+
+  }
+
   /** Runs the lift with a state-machine (automated process) */
-  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) {
+  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) throws InterruptedException {
 
     if(restartMachine) {
       currentState = TeleOpStateMachine.BlockOne;
@@ -141,8 +146,17 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
       t("Advancing Machine " + currentState.getPositionLabel());
     }
 
+    activateLift(LIFT_GRAB_POSITION, LIFT_PWR);
+    while(lift.isBusy()) { idle(); }
+
+    controlBlock(true, false);
+    Thread.sleep(1000);
+
     activateLift(currentState.getPosition(), LIFT_PWR);
     while(lift.isBusy()) { idle(); }
+
+    controlBlock(false, true);
+    Thread.sleep(1000);
 
     activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
     while(lift.isBusy()) { idle(); }

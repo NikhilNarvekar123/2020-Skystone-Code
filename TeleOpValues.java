@@ -11,6 +11,7 @@ interface TeleOpValues
 
   double LIFT_PWR = 0.3;
   double LIFT_MAINTAIN_POSITION = 200;
+  double LIFT_GRAB_POSITION = 0;
   double[] BLOCK_POSITION = [0, 904, 804, 704, 604];
 
   double[] BLOCK_SERVO = {0.54, 0.13};

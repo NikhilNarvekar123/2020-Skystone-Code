@@ -136,6 +136,7 @@ public class TeleOpV1 extends TeleOpSystem {
       try {
         while(opModeIsActive() && !exit) {
           armControlManual();
+          controlBlock(gamepad2.right_bumper, gamepad2.left_bumper);
         }
       } catch(Exception e) {}
     }
