@@ -13,7 +13,7 @@ public class Controller extends LinearOpMode {
 
   /** Allows for toggle control during TeleOp. Flexible design means that
     * toggle controls are optional (based on variable states).
-    */
+    */  
 
   /* Constant */
   final int DEBOUNCING_NUMBER_OF_SAMPLES = 10;

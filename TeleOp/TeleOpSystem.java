@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.robotcore.external.State;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Disabled
-public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
+public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
 
   /* Vars */
   double DRIVE_COEFF = LINEAR_COEFF_NORM;
@@ -18,8 +19,8 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   /* Components */
   DcMotor motorLF, motorLB, motorRF, motorRB;
-  DcMotor lift, leftIntake, rightIntake;
-  Servo blockServo;
+  DcMotor lift, leftIntake, rightIntake, slideMotor;
+  Servo blockServo, blockServoClamp;
   Servo leftFound, rightFound;
   Servo leftGrabber, rightGrabber, capServo;
 
@@ -35,9 +36,11 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
     motorRF = hardwareMap.get(DcMotor.class,"motorRF");
     motorRB = hardwareMap.get(DcMotor.class,"motorRB");
     lift = hardwareMap.get(DcMotor.class,"lift");
+    slideMotor = hardwareMap.get(DcMotor.class, "slideMotor");
     leftFound = hardwareMap.get(Servo.class,"leftFound");
     rightFound = hardwareMap.get(Servo.class,"rightFound");
     blockServo = hardwareMap.get(Servo.class,"blockServo");
+    blockServoClamp = hardwareMap.get(Servo.class, "blockServoClamp");
     leftIntake = hardwareMap.get(DcMotor.class,"leftIntake");
     rightIntake = hardwareMap.get(DcMotor.class,"rightIntake");
     leftGrabber = hardwareMap.get(Servo.class,"leftGrabber");
@@ -48,6 +51,12 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
     lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     lift.setDirection(DcMotor.Direction.REVERSE);
     blockServo.setPosition(0.54);
+
+
+    motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    motorLB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    motorRB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
     gamepad = new Controller(gamepad1, gamepad2);
     currentState = TeleOpStateMachine.BlockZero;
@@ -146,21 +155,35 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
       t("Advancing Machine " + currentState.getPositionLabel());
     }
 
+    gamepad.yToggle2 = false;
+
+    // Go Down for Pickup
     activateLift(LIFT_GRAB_POSITION, LIFT_PWR);
-    while(lift.isBusy()) { idle(); }
+    while((opModeIsActive() && lift.isBusy()) || !gamepad.yToggle2) { t("lowering"); idle(); }
+    gamepad.yToggle2 = false;
 
+    // Grab Block
     controlBlock(true, false);
-    Thread.sleep(1000);
+    while(opModeIsActive() && !gamepad.yToggle2) { t("grabbing block"); idle(); }
+    //while(opModeIsActive() && (leftGrabber.getPosition() != 0.36)  && !yToggle) { idle(); }
+    gamepad.yToggle2 = false;
 
+    // Place Position
     activateLift(currentState.getPosition(), LIFT_PWR);
-    while(lift.isBusy()) { idle(); }
+    while((opModeIsActive() && lift.isBusy()) || !gamepad.yToggle2) { t("placing"); idle(); }
 
+    gamepad.yToggle2 = false;
+
+    // Release Block
     controlBlock(false, true);
-    Thread.sleep(1000);
+    while(opModeIsActive()&& !gamepad.yToggle2) { t("releasing block"); idle(); }
 
+    // Go to Median Position
     activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
-    while(lift.isBusy()) { idle(); }
+    while(opModeIsActive() && lift.isBusy()) { idle(); }
 
+    gamepad.yToggle2 = false;
+    t("State Done");
   }
 
   /** Runs the lift manually (using gamepad-triggers) */
@@ -190,6 +213,7 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
     else
       liftPos = LIFT_MAINTAIN_POSITION;
 
+    t(Double.toString(liftPos));
   }
 
   /** Telemetry-call consolidated into one method */
@@ -200,8 +224,8 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues{
 
   /** Stacked telemetry-call (more than one data piece to be pushed at once) in overloaded method */
   public void t(String[] data) {
-    for(String s : data)
-      telemetry.addData("",data);
+    for(int i = 0; i < data.length; i++)
+      telemetry.addData("", data[i]);
     telemetry.update();
   }
 }

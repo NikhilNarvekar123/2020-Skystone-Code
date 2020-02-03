@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
-@Autonomous(group="Blue", name="BlueStone2")
+@Autonomous(group="Stone", name="BlueStone2")
 
 public class BlueStone2 extends AutoSystem implements AutoValues {
 

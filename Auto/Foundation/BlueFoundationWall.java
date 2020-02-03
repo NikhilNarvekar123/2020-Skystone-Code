@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
-@Autonomous(group="Blue", name="BlueFoundationWall")
+@Autonomous(group="Foundation", name="BlueFoundationWall")
 
 public class BlueFoundationWall extends AutoSystem implements AutoValues {
 

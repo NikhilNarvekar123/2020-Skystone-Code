@@ -44,37 +44,36 @@ public class BlueStone1 extends AutoSystem implements AutoValues {
 
       int deltaPos = 0;
 
-      //nikhil cant code...also i love nikhil - from sriman t
-      if(stoneLocation.equals("BLUE_LEFT")) {
-        deltaPos = -7;
-      } else if(stoneLocation.equals("BLUE_CENTER")) {
-        moveBackward(7, LINEAR_SPEED_NORM, 1);
-        deltaPos = 2;
-      } else {
-        moveBackward(14, LINEAR_SPEED_NORM, 1);
-        deltaPos = 4;
+      switch(stoneLocation) {
+        case "BLUE_LEFT":
+          deltaPos = -7;
+          break;
+        case "BLUE_CENTER":
+          moveBackward(7, LINEAR_SPEED_NORM, 1);
+          deltaPos = 2;
+          break;
+        default:
+          moveBackward(14, LINEAR_SPEED_NORM, 1);
+          deltaPos = 4;
+          break;
       }
 
       TFODShutDown();
 
       strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
 
       clampBlock();
       sleep(DEFAULT_SERVO_DELAY);
 
       strafeLeft(7, SIDEWAYS_SPEED_MAX, 2);
-      sleep(DEFAULT_METHOD_DELAY);
 
       moveForward(47 + deltaPos, LINEAR_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
 
       releaseBlock();
       sleep(DEFAULT_SERVO_DELAY);
 
       moveBackward(12 + deltaPos, LINEAR_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      
       break;
 
     }
