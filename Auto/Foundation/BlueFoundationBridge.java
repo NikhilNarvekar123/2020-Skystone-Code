@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.Auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -36,50 +36,37 @@ public class BlueFoundationBridge extends AutoSystem implements AutoValues {
 
       // Strafe to foundation center
       strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      
       // Approach foundation
-      moveBackward(30,LINEAR_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      moveBackward(30, LINEAR_SPEED_MAX, 1);
+      
       // Grab foundation
-      leftClamp.setPosition(0.7);
-      rightClamp.setPosition(0.24);
+      clampFoundation();
       sleep(1000);
 
       // Move foundation into building zone
       moveForward(36, LINEAR_SPEED_MAX, 0.865);
 
       // Release foundation
-      leftClamp.setPosition(0.35);
-      rightClamp.setPosition(0.65);
+      releaseFoundation();
       sleep(1000);
 
       // Give robot space to strafe
       moveBackward(2, LINEAR_SPEED_NORM, 1);
-      sleep(DEFAULT_METHOD_DELAY);
       moveForward(1, LINEAR_SPEED_MIN, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      
       // Strafe out from foundation
       strafeLeft(26, SIDEWAYS_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      
       // Move backwards towards bridge
       moveBackward(17, LINEAR_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
+      
       // Push foundation in (SAFETY)
       strafeRight(5,1,1);
-      sleep(500);
-
+      
       // Strafe towards bridge
       strafeLeft(25, SIDEWAYS_SPEED_MAX, 1.071);
-      sleep(DEFAULT_METHOD_DELAY);
-
-      // Park
-      rotate((int)(-getAngle()), DEFAULT_ROTATE_SPEED);
-      sleep(DEFAULT_METHOD_DELAY);
+      
       break;
 
     }
