@@ -17,12 +17,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
-@Autonomous(group="Foundation", name="BlueFoundationBridge")
+@Autonomous(group="Park", name="ParkBridgeBFRS_DELAY")
 
-public class BlueFoundationBridge extends AutoSystem implements AutoValues {
+public class ParkBridgeBFRSDelay extends AutoSystem implements AutoValues {
 
+  /** Orient the front of the robot towards the parking line.
+    * Works for Blue Foundation and Red Stone Sides
+    */
 
-  public BlueFoundationBridge()
+  public ParkBridgeBFRSDelay()
   {
     super("Off","Blue","Off");
   }
@@ -34,41 +37,16 @@ public class BlueFoundationBridge extends AutoSystem implements AutoValues {
     /* Main Loop */
     while(opModeIsActive()) {
 
-      // Strafe to foundation center
-      strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
-      
-      // Approach foundation
-      moveBackward(30, LINEAR_SPEED_MAX, 1);
-      
-      // Grab foundation
-      clampFoundation();
-      sleep(1000);
+      // Wait for 22 seconds before moving 
+      sleep(22000);
 
-      // Move foundation into building zone
-      moveForward(36, LINEAR_SPEED_MAX, 0.865);
-
-      // Release foundation
-      releaseFoundation();
-      sleep(1000);
-
-      // Give robot space to strafe
-      moveBackward(2, LINEAR_SPEED_NORM, 1);
-      moveForward(1, LINEAR_SPEED_MIN, 1);
-      
-      // Strafe out from foundation
+      // Move to parallel with bridge
       strafeLeft(26, SIDEWAYS_SPEED_MAX, 1);
-      
-      // Move backwards towards bridge
-      moveBackward(17, LINEAR_SPEED_MAX, 1);
-      
-      // Push foundation in (SAFETY)
-      strafeRight(5,1,1);
-      
-      // Strafe towards bridge
-      strafeLeft(25, SIDEWAYS_SPEED_MAX, 1.071);
-      
-      break;
+      sleep(DEFAULT_SERVO_DELAY);
 
+      // Move to Park
+      moveForward(20, LINEAR_SPEED_MAX, 1);
+      break;
     }
   }
 

@@ -17,12 +17,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
-@Autonomous(group="Foundation", name="BlueFoundationBridge")
+@Autonomous(group="Park", name="ParkBridgeRFBS_DELAY")
 
-public class BlueFoundationBridge extends AutoSystem implements AutoValues {
+public class ParkBridgeRFBSDelay extends AutoSystem implements AutoValues {
 
+  /** Orient the front of the robot towards the parking line.
+    * Works for Red Foundation and Blue Stone Sides
+    */
 
-  public BlueFoundationBridge()
+  public ParkBridgeRFBSDelay()
   {
     super("Off","Blue","Off");
   }
@@ -33,42 +36,17 @@ public class BlueFoundationBridge extends AutoSystem implements AutoValues {
 
     /* Main Loop */
     while(opModeIsActive()) {
+      
+      // delay for 22 seconds then move 
+      sleep(22000);
 
-      // Strafe to foundation center
-      strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
-      
-      // Approach foundation
-      moveBackward(30, LINEAR_SPEED_MAX, 1);
-      
-      // Grab foundation
-      clampFoundation();
-      sleep(1000);
+      // Move to parallel with bridge
+      strafeRight(26, SIDEWAYS_SPEED_MAX, 1);
+      sleep(DEFAULT_SERVO_DELAY);
 
-      // Move foundation into building zone
-      moveForward(36, LINEAR_SPEED_MAX, 0.865);
-
-      // Release foundation
-      releaseFoundation();
-      sleep(1000);
-
-      // Give robot space to strafe
-      moveBackward(2, LINEAR_SPEED_NORM, 1);
-      moveForward(1, LINEAR_SPEED_MIN, 1);
-      
-      // Strafe out from foundation
-      strafeLeft(26, SIDEWAYS_SPEED_MAX, 1);
-      
-      // Move backwards towards bridge
-      moveBackward(17, LINEAR_SPEED_MAX, 1);
-      
-      // Push foundation in (SAFETY)
-      strafeRight(5,1,1);
-      
-      // Strafe towards bridge
-      strafeLeft(25, SIDEWAYS_SPEED_MAX, 1.071);
-      
+      // Move to Park
+      moveForward(20, LINEAR_SPEED_MAX, 1);
       break;
-
     }
   }
 
