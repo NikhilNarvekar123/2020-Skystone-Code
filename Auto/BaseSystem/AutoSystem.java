@@ -250,6 +250,8 @@ public class AutoSystem extends LinearOpMode {
     motors[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); motors[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     motors[2].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); motors[3].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+    // Delay to prevent jerking-motion
+    sleep(50);
   }
   /* Runs motors to target position */
   public void runMotors(double speed) {
