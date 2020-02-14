@@ -34,15 +34,17 @@ public class BlueFoundationWall extends AutoSystem implements AutoValues {
     /* Main Loop */
     while(opModeIsActive()) {
 
+      releaseFoundation();
+
       // Strafe to foundation center
       strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
-      
+
       // Approach foundation
       moveBackward(30, LINEAR_SPEED_MAX, 1);
-      
+
       // Grab foundation
       clampFoundation();
-      sleep(1000);
+      sleep(750);
 
       // Move foundation into building zone
       moveForward(36, LINEAR_SPEED_MAX, 0.865);
@@ -54,10 +56,10 @@ public class BlueFoundationWall extends AutoSystem implements AutoValues {
       // Give robot space to strafe
       moveBackward(2, LINEAR_SPEED_NORM, 1);
       moveForward(1, LINEAR_SPEED_MIN, 1);
-      
-      // Strafe out from foundation and go towards bridge 
+
+      // Strafe out from foundation and go towards bridge
       strafeLeft(51, SIDEWAYS_SPEED_MAX, 1);
-      
+
       break;
 
     }

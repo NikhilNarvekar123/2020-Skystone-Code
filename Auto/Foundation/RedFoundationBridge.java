@@ -33,6 +33,8 @@ public class RedFoundationBridge extends AutoSystem implements AutoValues {
     /* Main Loop */
     while(opModeIsActive()) {
 
+      releaseFoundation();
+
       // Strafe to foundation center
       strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
@@ -41,7 +43,7 @@ public class RedFoundationBridge extends AutoSystem implements AutoValues {
 
       // Grab foundation
       clampFoundation();
-      sleep(1000);
+      sleep(750);
 
       // Move foundation into building zone
       moveForward(36, LINEAR_SPEED_MAX, 0.865);
@@ -53,19 +55,19 @@ public class RedFoundationBridge extends AutoSystem implements AutoValues {
       // Give robot space to strafe
       moveBackward(2, LINEAR_SPEED_NORM, 1);
       moveForward(1, LINEAR_SPEED_MIN, 1);
-      
+
       // Strafe out from foundation
       strafeRight(26, SIDEWAYS_SPEED_MAX, 1);
-      
+
       // Move backwards towards bridge
       moveBackward(17, LINEAR_SPEED_MAX, 1);
-      
+
       // Push foundation in (SAFETY)
       strafeLeft(5, LINEAR_SPEED_MAX, 1);
-      
+
       // Strafe towards bridge
-      strafeRight(20, SIDEWAYS_SPEED_MAX, 1.071);
-      
+      strafeRight(25, SIDEWAYS_SPEED_MAX, 1.071);
+
       break;
 
     }
