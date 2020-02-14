@@ -9,29 +9,28 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="TeleOp V6")
+@TeleOp(name="TeleOp V7")
 public class TeleOpV1 extends TeleOpSystem {
+
 
   /** Main Execution **/
   public void runOpMode() throws InterruptedException {
 
         /** Init Code */
         super.runOpMode();
-        AutoArmThread autoThread = new AutoArmThread(currentState);
-        ManualArmThread manualThread = new ManualArmThread();
-        String[] data = new String[3];
+        //AutoArmThread autoThread = new AutoArmThread(currentState);
+        //ManualArmThread manualThread = new ManualArmThread();
+
+        String[] data = new String[4];
         waitForStart();
+        boolean outputting = false;
+        double currentSlidePosition = 0.0;
 
         /** Starting Auto Thread */
-        manualThread.start();
+        //manualThread.start();
 
         /** Main Loop */
         while(opModeIsActive()) {
-
-
-
-
-
 
           /** Update state of both gamepads */
           gamepad.update1();
@@ -59,25 +58,56 @@ public class TeleOpV1 extends TeleOpSystem {
           motorRF.setPower(DRIVE_COEFF * (-dy - dx - turn));
           motorRB.setPower(DRIVE_COEFF * (-dy + dx - turn));
 
+          if(gamepad.dpadDownToggle2) {
+            rightIntakeDeploy.setPosition(0.55);
+            leftIntakeDeploy.setPosition(0);
+          } else if(!outputting) {
+            rightIntakeDeploy.setPosition(0.11);
+            leftIntakeDeploy.setPosition(0.4);
+          }
 
           /** Intake Control */
           if(gamepad.xToggle1) {
-                leftIntake.setPower(0.5);
-                rightIntake.setPower(-0.5);
+            leftIntake.setPower(0.5);
+            rightIntake.setPower(-0.5);
+          } else if(gamepad.rightStickToggle1) {
+            outputting = true;
+            rightIntakeDeploy.setPosition(0.26);
+            leftIntakeDeploy.setPosition(0.21);
+            sleep(400);
+            leftIntake.setPower(-1);
+            rightIntake.setPower(1);
+            sleep(400);
+            gamepad.rightStickToggle1 = false;
           } else {
-                leftIntake.setPower(gamepad1.right_stick_y);
-                rightIntake.setPower(-gamepad1.right_stick_y);
+            leftIntake.setPower(gamepad1.right_stick_y);
+            rightIntake.setPower(-gamepad1.right_stick_y);
+            outputting = false;
           }
 
+          // Manual Output
+          armControlManual();
+          controlBlock();
+
+/**
+          currentSlidePosition = slideMotor.getCurrentPosition();
+          if(currentSlidePosition < 0)
+            slideMotor.setPower(-gamepad2.right_stick_y * 0.7);
+          else
+            slideMotor.setPower(-Math.abs(gamepad2.right_stick_y) * 0.4);
+   **/
+
+          slideControlManual();
 
           /** All on-robot servo control */
           servoControl();
 
           /** Telemetry Calls **/
-          //data[0] = "Lift Position " + lift.getCurrentPosition();
-          //data[1] = "Lift Desired Position " + liftPos;
-          //data[2] = "Base Speed " + DRIVE_COEFF;
-          //t(data);
+          data[0] = "Lift Position " + lift.getCurrentPosition();
+          data[1] = "Lift Desired Position " + liftPos;
+          data[2] = "Base Speed " + DRIVE_COEFF;
+          data[3] = "Slide Position " + slideMotor.getCurrentPosition();
+          t(data);
         }
   }
 
@@ -138,7 +168,7 @@ public class TeleOpV1 extends TeleOpSystem {
           try {
                 while(opModeIsActive() && !isInterrupted()) {
                   armControlManual();
-                  controlBlock(gamepad2.right_bumper, gamepad2.left_bumper);
+                  //controlBlock(gamepad2.right_bumper, gamepad2.left_bumper);
                 }
             } catch(Exception e) {}
         }

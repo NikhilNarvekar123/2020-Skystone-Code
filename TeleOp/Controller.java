@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -13,7 +13,7 @@ public class Controller extends LinearOpMode {
 
   /** Allows for toggle control during TeleOp. Flexible design means that
     * toggle controls are optional (based on variable states).
-    */  
+    */
 
   /* Constant */
   final int DEBOUNCING_NUMBER_OF_SAMPLES = 10;
@@ -23,6 +23,12 @@ public class Controller extends LinearOpMode {
   int aCount2, bCount2, xCount2, yCount2;
   boolean aToggle1, bToggle1, xToggle1, yToggle1;
   boolean aToggle2, bToggle2, xToggle2, yToggle2;
+
+  /** Joystick Button Counter and State Variable */
+  int rightStick1, leftStick1;
+  int rightStick2, leftStick2;
+  boolean rightStickToggle1, leftStickToggle1;
+  boolean rightStickToggle2, leftStickToggle2;
 
   /* Dpad Counters and State Variables */
   int dpadDownCount1, dpadUpCount1;
@@ -102,6 +108,33 @@ public class Controller extends LinearOpMode {
     if(rightBumperCount1 == DEBOUNCING_NUMBER_OF_SAMPLES)
       rightBumperToggle1 = !rightBumperToggle1;
 
+    if(gamepad1.left_stick_button)
+      leftStick1++;
+    else
+      leftStick1 = 0;
+    if(leftStick1 == DEBOUNCING_NUMBER_OF_SAMPLES)
+      leftStickToggle1 = !leftStickToggle1;
+
+    if(gamepad1.right_stick_button)
+      rightStick1++;
+    else
+      rightStick1 = 0;
+    if(rightStick1 == DEBOUNCING_NUMBER_OF_SAMPLES)
+      rightStickToggle1 = !rightStickToggle1;
+
+    if(gamepad2.left_stick_button)
+      leftStick2++;
+    else
+      leftStick2 = 0;
+    if(leftStick2 == DEBOUNCING_NUMBER_OF_SAMPLES)
+      leftStickToggle2 = !leftStickToggle2;
+
+    if(gamepad2.right_stick_button)
+      rightStick2++;
+    else
+      rightStick2 = 0;
+    if(rightStick2 == DEBOUNCING_NUMBER_OF_SAMPLES)
+      rightStickToggle2 = !rightStickToggle2;
 
   }
 

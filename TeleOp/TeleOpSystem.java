@@ -16,13 +16,15 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
   double TURN_COEFF = TURN_COEFF_NORM;
   double dy, dx, turn = 0.0;
   double liftPos = 0.0;
+  double slidePos = 0.0;
 
   /* Components */
   DcMotor motorLF, motorLB, motorRF, motorRB;
   DcMotor lift, leftIntake, rightIntake, slideMotor;
   Servo blockServo, blockServoClamp;
   Servo leftFound, rightFound;
-  Servo leftGrabber, rightGrabber, capServo;
+  Servo rightGrabber, capServo;
+  Servo leftIntakeDeploy, rightIntakeDeploy;
 
   Controller gamepad;
   TeleOpStateMachine currentState;
@@ -43,15 +45,21 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     blockServoClamp = hardwareMap.get(Servo.class, "blockServoClamp");
     leftIntake = hardwareMap.get(DcMotor.class,"leftIntake");
     rightIntake = hardwareMap.get(DcMotor.class,"rightIntake");
-    leftGrabber = hardwareMap.get(Servo.class,"leftGrabber");
     rightGrabber = hardwareMap.get(Servo.class,"rightGrabber");
     capServo = hardwareMap.get(Servo.class, "capServo");
+    leftIntakeDeploy = hardwareMap.get(Servo.class, "leftIntakeDeploy");
+    rightIntakeDeploy = hardwareMap.get(Servo.class, "rightIntakeDeploy");
+
 
     /* Init Code */
     lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     lift.setDirection(DcMotor.Direction.REVERSE);
-    blockServo.setPosition(0.54);
-
+    blockServo.setPosition(BLOCK_SERVO[0]);
+    blockServoClamp.setPosition(BLOCK_SERVO[0]);
+    slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    slideMotor.setDirection(DcMotor.Direction.REVERSE);
+    lift.setDirection(DcMotor.Direction.REVERSE);
+    slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
 
     motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     motorLB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -93,7 +101,7 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
 
   /* Modifies a gamepad joystick value to map to the encoder positions of the lift motor. For faster lift, change k. */
   public int rangeScaler(double valToScale) {
-    int scaleFactor = 2;
+    int scaleFactor = 3;
     return (int)(Math.round(scaleFactor * valToScale));
   }
 
@@ -104,6 +112,16 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
   }
 
+  public void activateSlide(double position, double pwr) {
+    slideMotor.setTargetPosition((int)(Math.round(position)));
+    slideMotor.setPower(pwr);
+    slideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+  }
+
+  public void resetSlide() {
+    slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+  }
+
   /** Controls all on-robot servos */
   public void servoControl() {
 
@@ -112,30 +130,33 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     else
       blockServo.setPosition(BLOCK_SERVO[0]);
 
-    if(gamepad2.y)
+    if(gamepad.bToggle1)
+      blockServoClamp.setPosition(BLOCK_SERVO_CLAMP[1]);
+    else
+      blockServoClamp.setPosition(BLOCK_SERVO_CLAMP[0]);
+
+    if(gamepad.yToggle2)
       capServo.setPosition(CAP_SERVO[1]);
     else
       capServo.setPosition(CAP_SERVO[0]);
 
-    if(gamepad.dpadDownToggle1 || gamepad.dpadDownToggle2) {
-      leftFound.setPosition(LEFT_FOUND[1]);
-      rightFound.setPosition(RIGHT_FOUND[1]);
-    } else {
+    if(gamepad.dpadDownToggle1) {
       leftFound.setPosition(LEFT_FOUND[0]);
       rightFound.setPosition(RIGHT_FOUND[0]);
+    } else {
+      leftFound.setPosition(LEFT_FOUND[1]);
+      rightFound.setPosition(RIGHT_FOUND[1]);
     }
 
   }
 
   /** Control block grabbers during auto and manual threads */
-  public void controlBlock(boolean close, boolean open) {
+  public void controlBlock() {
 
-    if(open) {
-      leftGrabber.setPosition(LEFT_GRABBER[0]);
+    if(gamepad.leftBumperToggle2) {
       rightGrabber.setPosition(RIGHT_GRABBER[0]);
     }
-    else if(close) {
-      leftGrabber.setPosition(LEFT_GRABBER[1]);
+    else {
       rightGrabber.setPosition(RIGHT_GRABBER[1]);
     }
 
@@ -157,16 +178,7 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
 
     gamepad.yToggle2 = false;
 
-    // Go Down for Pickup
-    activateLift(LIFT_GRAB_POSITION, LIFT_PWR);
-    while((opModeIsActive() && lift.isBusy()) || !gamepad.yToggle2) { t("lowering"); idle(); }
-    gamepad.yToggle2 = false;
 
-    // Grab Block
-    controlBlock(true, false);
-    while(opModeIsActive() && !gamepad.yToggle2) { t("grabbing block"); idle(); }
-    //while(opModeIsActive() && (leftGrabber.getPosition() != 0.36)  && !yToggle) { idle(); }
-    gamepad.yToggle2 = false;
 
     // Place Position
     activateLift(currentState.getPosition(), LIFT_PWR);
@@ -175,7 +187,7 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     gamepad.yToggle2 = false;
 
     // Release Block
-    controlBlock(false, true);
+    //controlBlock(false, true);
     while(opModeIsActive()&& !gamepad.yToggle2) { t("releasing block"); idle(); }
 
     // Go to Median Position
@@ -184,6 +196,26 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
 
     gamepad.yToggle2 = false;
     t("State Done");
+  }
+
+
+  /** Runs the slide manually (using gamepad-joysticks) */
+  public void slideControlManual() {
+
+    boolean maintain = gamepad2.right_stick_button;
+    t(String.valueOf(maintain));
+    if(!maintain) {
+      resetSlide();
+      slidePos = slideMotor.getCurrentPosition();
+      if(slidePos >= 0)
+        slideMotor.setPower(-gamepad2.right_stick_y * 0.7);
+      else
+        slideMotor.setPower(-Math.abs(gamepad2.right_stick_y) * 0.4);
+    } else {
+      slidePos = slideMotor.getCurrentPosition();
+      int targetPosition = (int)(Math.round(slidePos));
+      activateSlide(targetPosition, SLIDE_PWR);
+    }
   }
 
   /** Runs the lift manually (using gamepad-triggers) */
@@ -213,8 +245,8 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     else
       liftPos = LIFT_MAINTAIN_POSITION;
 
-    t(Double.toString(liftPos));
   }
+
 
   /** Telemetry-call consolidated into one method */
   public void t(String data) {

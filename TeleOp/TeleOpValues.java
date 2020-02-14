@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 interface TeleOpValues
 {
@@ -10,14 +10,17 @@ interface TeleOpValues
   double LINEAR_COEFF_MIN = 0.3;
 
   double LIFT_PWR = 0.3;
+  double SLIDE_PWR = 0.8;
   double LIFT_MAINTAIN_POSITION = 200;
+  double SLIDE_MAINTAIN_POSITION = 0;
   double LIFT_GRAB_POSITION = 0;
   double[] BLOCK_POSITION = {0, 904, 804, 704, 604};
+  double[] SLIDE_POSITION = {0, 1500};
 
-  double[] BLOCK_SERVO = {0.54, 0.13};
+  double[] BLOCK_SERVO = {0.4, 0.17};
+  double[] BLOCK_SERVO_CLAMP = {0.0, 0.4};
   double[] CAP_SERVO = {0.3, 1};
-  double[] LEFT_GRABBER = {0.5, 0.36};
-  double[] RIGHT_GRABBER = {0.67, 0.8};
-  double[] LEFT_FOUND = {0.35, 0.7};
-  double[] RIGHT_FOUND = {0.65, 0.24};
+  double[] RIGHT_GRABBER = {0, 0.15};
+  double[] LEFT_FOUND = {0, 1};
+  double[] RIGHT_FOUND = {1, 0};
 }
