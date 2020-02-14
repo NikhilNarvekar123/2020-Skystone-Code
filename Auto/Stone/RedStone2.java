@@ -42,6 +42,7 @@ public class RedStone2 extends AutoSystem implements AutoValues {
 
       // Allow Time for robot to stabilize and detect skblockServoClampPosstone
       sleep(DETECTION_DELAY);
+      //String stoneLocation = "RED";
       String stoneLocation = scanner();
       telemetry.addLine(stoneLocation);
       telemetry.update();
@@ -60,14 +61,14 @@ public class RedStone2 extends AutoSystem implements AutoValues {
       TFODShutDown();
 
       // Move to pickup first skystone
-      strafeRight(13, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Grab Skystone
-      clampBlock();
+      clampBlockNormal();
 
       // Strafe Outwards
-      strafeLeft(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
       // Deposit first skystone
       if(stoneLocation.equals("RED_RIGHT"))
@@ -84,22 +85,22 @@ public class RedStone2 extends AutoSystem implements AutoValues {
 
       // Move to Second Skystone
       if(stoneLocation.equals("RED_RIGHT"))
-        moveForward(50, LINEAR_SPEED_MAX, 1);
+        moveForward(54, LINEAR_SPEED_MAX, 1);
       else if(stoneLocation.equals("RED_CENTER"))
-        moveForward(58, LINEAR_SPEED_MAX, 1);
+        moveForward(60, LINEAR_SPEED_MAX, 1);
       else
-        moveForward(56, LINEAR_SPEED_MAX, 1);
+        moveForward(68, LINEAR_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Move to pickup second skystone
-      strafeRight(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Grab Second Skystone
-      clampBlock();
+      clampBlockNormal();
 
       // Move Outwards
-      strafeLeft(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
       // Deposit Second Skystone
       if(stoneLocation.equals("RED_RIGHT"))
@@ -115,7 +116,7 @@ public class RedStone2 extends AutoSystem implements AutoValues {
       sleep(DEFAULT_SERVO_DELAY);
 
       // Move to Park
-      moveForward(9, LINEAR_SPEED_MAX, 1);
+      moveForward(13, LINEAR_SPEED_MAX, 1);
       break;
     }
   }

@@ -42,6 +42,7 @@ public class RedStone1 extends AutoSystem implements AutoValues {
 
       // Allow Time for robot to stabilize and detect skblockServoClampPosstone
       sleep(DETECTION_DELAY);
+      //String stoneLocation = "RETER";
       String stoneLocation = scanner();
       telemetry.addLine(stoneLocation);
       telemetry.update();
@@ -60,14 +61,14 @@ public class RedStone1 extends AutoSystem implements AutoValues {
       TFODShutDown();
 
       // Move to pickup first skystone
-      strafeRight(13, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Grab Skystone
-      clampBlock();
+      clampBlockNormal();
 
       // Strafe Outwards
-      strafeLeft(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
       // Deposit first skystone
       if(stoneLocation.equals("RED_RIGHT"))

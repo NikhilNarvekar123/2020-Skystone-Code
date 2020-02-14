@@ -439,6 +439,18 @@ public class AutoSystem extends LinearOpMode {
     }
 
   }
+
+  /* Changes the position of the clamp-block-servo as a function of the
+   * position of the block-servo.
+   */
+  public void clampBlockNormal() {
+    blockServo.setPosition(0.15);
+    sleep(500);
+    blockServoClamp.setPosition(0);
+    sleep(500);
+    blockServo.setPosition(0.4);
+  }
+
   /* Releases Block */
   public void releaseBlock() {
     servos[3].setPosition(0.3);
