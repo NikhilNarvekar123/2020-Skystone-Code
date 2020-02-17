@@ -2,9 +2,14 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 public enum ArmStateMachine {
 
+  ZeroPosition {
+    public ArmStateMachine nextState() { return GoBack; }
+    public ArmStateMachine prevState() { return GoBack; }
+    public String getLocationLabel() { return "Zero Position"; }
+  }
   GoBack {
     public ArmStateMachine nextState() { return Pickup; }
-    public ArmStateMachine prevState() { return Pickup; }
+    public ArmStateMachine prevState() { return Release; }
     public String getLocationLabel() { return "Maintaining"; }
   },
   Pickup {

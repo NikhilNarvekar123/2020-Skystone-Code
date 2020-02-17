@@ -42,6 +42,7 @@ public class GargantuaRed extends AutoSystem implements AutoValues {
 
       // Allow Time for robot to stabilize and detect skblockServoClampPosstone
       sleep(DETECTION_DELAY);
+      //String stoneLocation = "RED";
       String stoneLocation = scanner();
       telemetry.addLine(stoneLocation);
       telemetry.update();
@@ -60,14 +61,14 @@ public class GargantuaRed extends AutoSystem implements AutoValues {
       TFODShutDown();
 
       // Move to pickup first skystone
-      strafeRight(13, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Grab Skystone
-      clampBlock();
+      clampBlockNormal();
 
       // Strafe Outwards
-      strafeLeft(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
       // Deposit first skystone
       if(stoneLocation.equals("RED_RIGHT"))
@@ -78,55 +79,46 @@ public class GargantuaRed extends AutoSystem implements AutoValues {
         moveBackward(45, LINEAR_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
-      // Move to foundation to drop 
-      strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
-
       // Release Skystone
       releaseBlock();
       sleep(DEFAULT_SERVO_DELAY);
-
-      // Realign to pick up second stone 
-      strafeLeft(20, SIDEWAYS_SPEED_MAX, 1);
-      sleep(DEFAULT_METHOD_DELAY);
 
       // Move to Second Skystone
       if(stoneLocation.equals("RED_RIGHT"))
-        moveForward(50, LINEAR_SPEED_MAX, 1);
+        moveForward(54, LINEAR_SPEED_MAX, 1);
       else if(stoneLocation.equals("RED_CENTER"))
-        moveForward(58, LINEAR_SPEED_MAX, 1);
+        moveForward(60, LINEAR_SPEED_MAX, 1);
       else
-        moveForward(56, LINEAR_SPEED_MAX, 1);
+        moveForward(68, LINEAR_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Move to pickup second skystone
-      strafeRight(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(9, SIDEWAYS_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
       // Grab Second Skystone
-      clampBlock();
+      clampBlockNormal();
 
       // Move Outwards
-      strafeLeft(6, SIDEWAYS_SPEED_MAX, 1);
+      strafeLeft(9, SIDEWAYS_SPEED_MAX, 1);
 
       // Deposit Second Skystone
       if(stoneLocation.equals("RED_RIGHT"))
-        moveBackward(55, LINEAR_SPEED_MAX, 1);
+        moveBackward(70, LINEAR_SPEED_MAX, 1);
       else if(stoneLocation.equals("RED_CENTER"))
-        moveBackward(63, LINEAR_SPEED_MAX, 1);
+        moveBackward(74, LINEAR_SPEED_MAX, 1);
       else
-        moveBackward(71, LINEAR_SPEED_MAX, 1);
+        moveBackward(86, LINEAR_SPEED_MAX, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
-      // Move to foundation to drop 
-      strafeRight(20, SIDEWAYS_SPEED_MAX, 1);
+      strafeRight(10, 1, 1);
       sleep(DEFAULT_METHOD_DELAY);
 
-      // Release Skystone
+      // Release Second Skystone
       releaseBlock();
       sleep(DEFAULT_SERVO_DELAY);
 
-      // Move to grab foundation 
+      // Move to grab foundation
       rotate(-90, 0.5);
       clampFoundation();
       sleep(1000);
@@ -139,8 +131,8 @@ public class GargantuaRed extends AutoSystem implements AutoValues {
       sleep(1000);
 
       // Strafe out from foundation
-      strafeRight(56, SIDEWAYS_SPEED_MAX, 1);
-  
+      strafeRight(56, 1, 1);
+
       break;
     }
   }

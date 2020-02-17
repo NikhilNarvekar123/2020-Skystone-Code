@@ -24,7 +24,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 public class BlueStone2 extends AutoSystem implements AutoValues {
 
   public BlueStone2() {
-    super("off","blue","WebCam");
+    super("VuforiaOn","blue","WebCam");
   }
 
   public void runOpMode() throws InterruptedException {
@@ -42,8 +42,8 @@ public class BlueStone2 extends AutoSystem implements AutoValues {
 
       // Allow Time for robot to stabilize and detect skystone
       sleep(DETECTION_DELAY);
-      String stoneLocation = "BLUE_CENTER";
-      //String stoneLocation = scanner();
+      //String stoneLocation = "BLUE_CENTER";
+      String stoneLocation = scanner();
       telemetry.addLine(stoneLocation);
       telemetry.update();
 

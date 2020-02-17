@@ -25,9 +25,11 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
   Servo leftFound, rightFound;
   Servo rightGrabber, capServo;
   Servo leftIntakeDeploy, rightIntakeDeploy;
+  int[] liftPositions = {900, 800, 700, 600};
+  int currentLiftState = 0;
 
   Controller gamepad;
-  TeleOpStateMachine currentState;
+  ArmStateMachine armState = new ArmStateMachine();
 
   /* Main Execution Loop */
   public void runOpMode() throws InterruptedException {
@@ -156,48 +158,11 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
     if(gamepad.leftBumperToggle2) {
       rightGrabber.setPosition(RIGHT_GRABBER[0]);
     }
-    else {
+    else if(gamepad.rightBumperToggle2) {
       rightGrabber.setPosition(RIGHT_GRABBER[1]);
     }
 
   }
-
-  /** Runs the lift with a state-machine (automated process) */
-  public void armControlAutomatic(boolean nextState, boolean reverseState, boolean restartMachine) throws InterruptedException {
-
-    if(restartMachine) {
-      currentState = TeleOpStateMachine.BlockOne;
-      t("Restarting Machine (Block-One)");
-    } else if(reverseState) {
-      currentState = currentState.prevState();
-      t("Reversing Machine " + currentState.getPositionLabel());
-    } else if(nextState) {
-      currentState = currentState.nextState();
-      t("Advancing Machine " + currentState.getPositionLabel());
-    }
-
-    gamepad.yToggle2 = false;
-
-
-
-    // Place Position
-    activateLift(currentState.getPosition(), LIFT_PWR);
-    while((opModeIsActive() && lift.isBusy()) || !gamepad.yToggle2) { t("placing"); idle(); }
-
-    gamepad.yToggle2 = false;
-
-    // Release Block
-    //controlBlock(false, true);
-    while(opModeIsActive()&& !gamepad.yToggle2) { t("releasing block"); idle(); }
-
-    // Go to Median Position
-    activateLift(LIFT_MAINTAIN_POSITION, LIFT_PWR);
-    while(opModeIsActive() && lift.isBusy()) { idle(); }
-
-    gamepad.yToggle2 = false;
-    t("State Done");
-  }
-
 
   /** Runs the slide manually (using gamepad-joysticks) */
   public void slideControlManual() {
@@ -216,6 +181,8 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
       int targetPosition = (int)(Math.round(slidePos));
       activateSlide(targetPosition, SLIDE_PWR);
     }
+
+
   }
 
   /** Runs the lift manually (using gamepad-triggers) */
@@ -246,7 +213,6 @@ public class TeleOpSystem extends LinearOpMode implements TeleOpValues {
       liftPos = LIFT_MAINTAIN_POSITION;
 
   }
-
 
   /** Telemetry-call consolidated into one method */
   public void t(String data) {

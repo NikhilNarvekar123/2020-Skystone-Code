@@ -27,7 +27,7 @@ public class PIDController {
 
   public void calculateI() {
     error = target - input;
-    errorSum += error * ;
+    errorSum += error * deltaTime;
 
     pwr += Kp * error;
   }

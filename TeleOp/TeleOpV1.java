@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.State;
 import java.util.ArrayList;
 import java.lang.reflect.Array;
 import com.qualcomm.robotcore.util.Hardware;
@@ -18,16 +19,11 @@ public class TeleOpV1 extends TeleOpSystem {
 
         /** Init Code */
         super.runOpMode();
-        //AutoArmThread autoThread = new AutoArmThread(currentState);
-        //ManualArmThread manualThread = new ManualArmThread();
 
         String[] data = new String[4];
         waitForStart();
         boolean outputting = false;
         double currentSlidePosition = 0.0;
-
-        /** Starting Auto Thread */
-        //manualThread.start();
 
         /** Main Loop */
         while(opModeIsActive()) {
@@ -58,7 +54,7 @@ public class TeleOpV1 extends TeleOpSystem {
           motorRF.setPower(DRIVE_COEFF * (-dy - dx - turn));
           motorRB.setPower(DRIVE_COEFF * (-dy + dx - turn));
 
-          if(gamepad.dpadDownToggle2) {
+          if(gamepad.dpadUpToggle2) {
             rightIntakeDeploy.setPosition(0.55);
             leftIntakeDeploy.setPosition(0);
           } else if(!outputting) {
@@ -85,103 +81,30 @@ public class TeleOpV1 extends TeleOpSystem {
             outputting = false;
           }
 
-          // Manual Output
+          slideControlManual();
           armControlManual();
-          controlBlock();
 
 /**
-          currentSlidePosition = slideMotor.getCurrentPosition();
-          if(currentSlidePosition < 0)
-            slideMotor.setPower(-gamepad2.right_stick_y * 0.7);
-          else
-            slideMotor.setPower(-Math.abs(gamepad2.right_stick_y) * 0.4);
-   **/
-
-          slideControlManual();
+          if(gamepad2.left_trigger > 0) {
+            lift.setPower(0.4);
+          } else if(gamepad2.right_trigger > 0) {
+            lift.setPower(-0.4);
+          } else {
+            lift.setPower(0);
+          }
+**/
 
           /** All on-robot servo control */
           servoControl();
+          controlBlock();
 
           /** Telemetry Calls **/
           data[0] = "Lift Position " + lift.getCurrentPosition();
           data[1] = "Lift Desired Position " + liftPos;
-          data[2] = "Base Speed " + DRIVE_COEFF;
+          data[2] = "Base Speed " + currentLiftState;
           data[3] = "Slide Position " + slideMotor.getCurrentPosition();
           t(data);
         }
   }
-
-  /** The class contains the code for the automatic arm thread. This utilizes a state-machine
-   *  to move the arm between different positions with the single press of a button.
-   */
-  private class AutoArmThread extends Thread {
-
-        /** Vars **/
-        private TeleOpStateMachine state;
-        private boolean exit;
-
-        public AutoArmThread(TeleOpStateMachine state) {
-          this.state = state;
-          exit = false;
-        }
-
-        /** The main thread loop */
-        @Override
-        public void run() {
-          try {
-                while(opModeIsActive() && !isInterrupted()) {
-                  if(gamepad2.a || gamepad2.x || gamepad2.y)
-                        armControlAutomatic(gamepad2.y, gamepad2.a, gamepad2.x);
-                  else
-                    activateLift(200, 0.2);
-                }
-          } catch(Exception e) {}
-        }
-
-        /** Stops the current thread */
-        public void stopThread() {
-          exit = true;
-        }
-
-        /** Checks if current thread is running */
-        public boolean isRunning() {
-          return !exit;
-        }
-
-  }
-
-  /** The class contains the code for the lift arm to manually controlled by a driver. This runs in its
-   *  own separate thread.
-   */
-  private class ManualArmThread extends Thread {
-
-        /** Vars */
-        private boolean exit;
-
-        public ManualArmThread() {
-          exit = false;
-        }
-
-        /** Main thread loop */
-        @Override
-        public void run() {
-          try {
-                while(opModeIsActive() && !isInterrupted()) {
-                  armControlManual();
-                  //controlBlock(gamepad2.right_bumper, gamepad2.left_bumper);
-                }
-            } catch(Exception e) {}
-        }
-
-        /** Stops the thread */
-        public void stopThread() {
-          exit = true;
-        }
-
-        /** Checks whether or not the current thread is running */
-        public boolean isRunning() {
-          return exit;
-        }
-    }
 
 }
