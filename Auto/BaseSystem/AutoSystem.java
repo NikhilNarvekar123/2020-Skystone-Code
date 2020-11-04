@@ -25,6 +25,7 @@ public class AutoSystem extends LinearOpMode {
   /** Current Status: > Working on Ramping
     *                 > Working on solving motor-jerking problem
     *                 > Working on possible error-offshoot correction system
+    *                 > updated PID system
     */
 
   /* Components */
